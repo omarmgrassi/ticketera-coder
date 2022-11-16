@@ -1,0 +1,46 @@
+[
+    {
+        "nombre":"Conferencia Yo Pienso", 
+        "codigo":"EMPREN", 
+        "fecha":"16/11/2022", 
+        "cantEntradas":200, 
+        "lugar":"Casino Magic", 
+        "precioEntrada":1500, 
+        "tieneDescuento":true, 
+        "porcenDescuento":0.2, 
+        "img":"./img/yopienso.jpg"
+    },
+    {
+        "nombre":"Evento Yo Como", 
+        "codigo":"YC2022", 
+        "fecha":"22/10/2022", 
+        "cantEntradas":1500, 
+        "lugar":"Paseo de la Costa", 
+        "precioEntrada":800, 
+        "tieneDescuento":true, 
+        "porcenDescuento":0.25, 
+        "img":"./img/yocomo.jpg"
+    },
+    {
+        "nombre":"GnR en Argentina 2022", 
+        "codigo":"GNR", 
+        "fecha":"30/09/2022", 
+        "cantEntradas":60000, 
+        "lugar":"Estadio Monumental", 
+        "precioEntrada":3500, 
+        "tieneDescuento":false, 
+        "porcenDescuento":0, 
+        "img":"./img/gnr.jpg"
+    },
+    {
+        "nombre":"Servian - El circo", 
+        "codigo":"SERVIAN", 
+        "fecha":"02/12/2022", 
+        "cantEntradas":1000, 
+        "lugar":"Teatro Español", 
+        "precioEntrada":2000, 
+        "tieneDescuento":false, 
+        "porcenDescuento":0, 
+        "img":"./img/servian.jpg"
+    }
+]

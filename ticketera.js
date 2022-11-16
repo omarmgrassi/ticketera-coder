@@ -68,7 +68,7 @@ class Evento {
         this.entradasDisponibles = this.entradasDisponibles - cantidad;
 
         // Registro la venta realizada
-        this.arrayVentas.push( new Venta(nombreCliente, apellidoCliente, cantidad, importeEntradas) );
+        this.arrayVentas.push(new Venta(nombreCliente, apellidoCliente, cantidad, importeEntradas));
 
         // Devuelvo importe a abonar
         return importeEntradas;
@@ -77,40 +77,57 @@ class Evento {
 
 }
 
-// Genero los eventos disponibles en la ticketera
-const yoPienso = new Evento("Conferencia Yo Pienso", "EMPREN", "16/11/2022", 200, "Casino Magic", 1500, true, 0.20, "./img/yopienso.jpg");
-const yoComo = new Evento("Evento Yo Como", "YC2022", "22/10/2022", 1500, "Paseo de la Costa", 800, true, 0.25,"./img/yocomo.jpg");
-const gunsEnArgentina = new Evento("GnR en Argentina 2022", "GNR", "30/09/2022", 60000, "Estadio Monumental", 3500, false, 0, "./img/gnr.jpg");
-const circoServian = new Evento("Servian - El circo", "SERVIAN", "02/12/2022", 1000, "Teatro Español", 2000, false, 0, "./img/servian.jpg");
-
 // Inicializo la ticketera
-const ticketera = [];
+let ticketera = [];
+
 // Inicializo el carrito
 let carrito = [];
 
 // Cargo los eventos en la ticketera
-ticketera.push(yoPienso);
-ticketera.push(yoComo);
-ticketera.push(gunsEnArgentina);
-ticketera.push(circoServian);
+// Defino una funcion con async/await ya que necesito que termine la carga del JSON antes de mostrar las cards.
+
+async function obtenerEventos() {
+
+    const archivoEventosJson = "./json/eventos.json";
+    const eventos = await fetch(archivoEventosJson);
+    const datos = await eventos.json();
+    datos.forEach(e => {
+        // Recupero los datos del evento y creo nuevo objeto Evento
+        let evento = new Evento(e.nombre, e.codigo, e.fecha, e.cantEntradas, e.lugar, e.precioEntrada, e.tieneDescuento, e.porcenDescuento, e.img);
+        // Almaceno evento en el array 
+        ticketera.push(evento);
+    })
+
+    // Luego de terminar la carga muestro las cards
+    mostrarCards();
+
+}
+
+obtenerEventos();
+
+// Contenedor de cards
 
 const contenedorCards = document.getElementById("contenedorCards");
 const mostrarCards = () => {
-    ticketera.forEach( (evento) => {
+    ticketera.forEach((evento) => {
+        const btnPromo = ( evento.tieneDescuento ) ? `<button class="btn btn-danger" id="promo${evento.codigo}">Ver promo</button>` : ``;
         const card = document.createElement("div");
         card.classList.add("col-xl-3", "col-md-6", "col-xs-12");
         card.innerHTML = `
-        <div class="card" style="width: 18rem;">
-            <img src="${evento.img}" class="card-img-top" alt="${evento.nombre}">
-            <div class="card-body">
-                <h5 class="card-title">${evento.nombre}</h5>
-                <p class="card-text">${evento.lugar} - ${evento.fecha}</p>
-                <button class="btn btn-primary" id="boton${evento.codigo}">Quiero ir!</button>
-            </div>
-        </div>`;
+            <div class="card" style="width: 18rem;">
+                <img src="${evento.img}" class="card-img-top" alt="${evento.nombre}">
+                <div class="card-body">
+                    <h5 class="card-title">${evento.nombre}</h5>
+                    <p class="card-text">${evento.lugar} - ${evento.fecha}</p>
+                    <p class="card-text">Valor $${evento.valorEntrada} + IVA</p>
+                    <button class="btn btn-primary" id="boton${evento.codigo}">Quiero ir!</button>
+                    ${btnPromo}
+                </div>
+            </div>`;
 
         contenedorCards.appendChild(card);
 
+        // Integro librería Toastify al oprimir boton
         const boton = document.getElementById(`boton${evento.codigo}`);
         boton.addEventListener("click", () => {
             agregarAlCarrito(evento);
@@ -119,30 +136,33 @@ const mostrarCards = () => {
                 duration: 3000,
                 gravity: "bottom",
                 position: "left",
-                /* style:
-                {
-                    background: "linear-gradient(to right, #b7950b, #fedbd0)"
-                } */
                 className: "toastBkg"
             }).showToast();
         });
-    });
 
+        if (evento.tieneDescuento) {
+            let porDescuento = evento.descuento * 100;
+            // Integro librería SweetAlert si tiene descuento
+            // Se calcula el total menos el descuento luego sobre eso aplica el IVA
+            const botonPromo = document.getElementById(`promo${evento.codigo}`);
+            botonPromo.addEventListener("click", () => {
+                Swal.fire(
+                    'Tenemos promo!',
+                    'Comprando 2 o más entradas tendrás un ' + porDescuento + '% de descuento',
+                    'success'
+                  )
+            });
+        }
+        
+    });
 };
 
-mostrarCards();
+// Contenedor carrito de compras
 
 const contenedorCarrito = document.getElementById("contenedorCarrito");
-
-/* const verCarrito = document.getElementById("verCarrito");
-
-verCarrito.addEventListener("click", () => {
-    mostrarCarrito();
-}); */
-
 const mostrarCarrito = () => {
     contenedorCarrito.innerHTML = "";
-    carrito.forEach( ( compra ) => {
+    carrito.forEach((compra) => {
         const card = document.createElement("div");
         card.classList.add("col-xl-3", "col-md-6", "col-xs-12");
         card.innerHTML = `
@@ -180,15 +200,15 @@ const mostrarCarrito = () => {
 const agregarAlCarrito = (evento) => {
 
     // Busco si existe en el carrito una compra para ese evento
-    const operacionEnCarrito = carrito.find( (operacion) => operacion.evento === evento );
+    const operacionEnCarrito = carrito.find((operacion) => operacion.evento === evento);
 
-    if ( operacionEnCarrito ) {
+    if (operacionEnCarrito) {
         // Si existe, incremento cantidad de entradas
         operacionEnCarrito.cantEntradas++;
     }
     else {
         // Si no existe, genero uno nueva compra (por default 1 entrada)
-        carrito.push( new Compra(evento) );
+        carrito.push(new Compra(evento));
     }
 
     // Actualizo carrito
@@ -197,7 +217,7 @@ const agregarAlCarrito = (evento) => {
 }
 
 const vaciarCarrito = document.getElementById("vaciarCarrito");
-vaciarCarrito.addEventListener( "click", () => {
+vaciarCarrito.addEventListener("click", () => {
     eliminarTodoElCarrito();
 });
 
@@ -211,36 +231,36 @@ const eliminarTodoElCarrito = () => {
 const sumarEntradaACompra = (evento) => {
 
     // Busco si existe en el carrito una compra para ese evento
-    const compra = carrito.find( (compra) => compra.evento === evento );
+    const compra = carrito.find((compra) => compra.evento === evento);
     // Incremento la cantidad de entradas
     compra.cantEntradas++;
     // Actualizo carrito
     mostrarCarrito();
-    
+
 }
 
 const restarEntradaDeCompra = (evento) => {
 
     // Busco si existe en el carrito una compra para ese evento
-    const compra = carrito.find( (compra) => compra.evento === evento );
-    
+    const compra = carrito.find((compra) => compra.evento === evento);
+
     // Si la cantidad de entradas es > 1 descuento una unidad
-    if ( compra.cantEntradas > 1 ) {
+    if (compra.cantEntradas > 1) {
         compra.cantEntradas--;
     }
-    
+
     // Actualizo carrito
     mostrarCarrito();
-    
+
 }
 
 const eliminarCompraDelCarrito = (evento) => {
 
     // Busco si existe en el carrito una compra para ese evento
-    const compraSeleccion = carrito.find( (compra) => compra.evento === evento );
+    const compraSeleccion = carrito.find((compra) => compra.evento === evento);
 
     // Elimino la compra del carrito
-    let indice = carrito.indexOf( compraSeleccion );
+    let indice = carrito.indexOf(compraSeleccion);
     carrito.splice(indice, 1);
 
     // Actualizo carrito
@@ -250,14 +270,14 @@ const eliminarCompraDelCarrito = (evento) => {
 
 const calcularImporteCarrito = () => {
     let totalCompra = 0;
-    carrito.forEach( (compra) => {
+    carrito.forEach((compra) => {
         // Sumarizo total entradas del evento
         totalCompra += calcularTotalEntradas(compra.cantEntradas, compra.evento);
     });
     total.innerHTML = `${totalCompra}`;
 }
 
-// ** Definicion de FUNCIONES ** //
+// ** Funciones Auxiliares ** //
 
 function calcularTotalEntradas(cantidad, evento) {
 
@@ -265,7 +285,7 @@ function calcularTotalEntradas(cantidad, evento) {
     const IVA = 1.21;
 
     // Calculo el importe total
-    if ( evento.tieneDescuento && cantidad > 1 ) {
+    if (evento.tieneDescuento && cantidad > 1) {
         importeEntradas = ((evento.valorEntrada * IVA) - ((evento.valorEntrada * IVA) * evento.descuento)) * cantidad;
     }
     else {

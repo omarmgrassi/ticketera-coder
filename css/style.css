@@ -1,6 +1,6 @@
 * {
-    margin: 10;
-    padding: 10;
+    margin: 0;
+    padding: 0;
 }
 
 section {
@@ -12,11 +12,6 @@ section {
     height: 15vw;
     object-fit: cover;
 }
-
-/* .card {
-    margin-left: 20px;
-    margin-right: 20px; 
-} */
 
 .toastBkg {
     background: linear-gradient(to right, #593196, #B4A2D0);
