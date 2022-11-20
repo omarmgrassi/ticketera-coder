@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -64,24 +64,41 @@
         </nav>
     </header>
 
-    <section>
-        <h1>Ticketera CODER!</h1>
+    <!-- CARRUSEL -->
+    <section class="sectionCarrusel">
+        <div id="carouselExampleControls" class="carousel slide" data-bs-ride="carousel">
+            <div id="carruselEventos" class="carousel-inner">
+            </div>
+            <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleControls" data-bs-slide="prev">
+              <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+              <span class="visually-hidden">Previous</span>
+            </button>
+            <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleControls" data-bs-slide="next">
+              <span class="carousel-control-next-icon" aria-hidden="true"></span>
+              <span class="visually-hidden">Next</span>
+            </button>
+          </div>
     </section>
 
+    <!-- CARDS EVENTOS -->
     <section id="contenedorCards" class="row">
-        <h2>Espectaculos en cartelera</h2>
+        <h1 class="hSection">Espectaculos en cartelera</h1>
     </section>
 
+    <!-- CARRITO DE COMPRAS -->
     <section>
-        <h2>Carrito de compras</h2>
-        <h3>El total de su compra es $<span id="total">0</span></h3>
+        <h2 class="hSection">Carrito de compras</h2>
+        <h3 class="detalleCompra">El total de su compra es $<span id="total">0</span></h3>
         <!-- <button class="btn btn-primary btn-sm" id="verCarrito">Ver Carrito</button> -->
         <button class="btn btn-primary btn-sm" id="vaciarCarrito">Vaciar Carrito</button>
+        <!-- <button class="btn btn-success btn-sm" id="pagarCarrito">Comprar</button> -->
+        <!-- <a class="btn btn-success btn-sm" href="./pages/checkout.html" role="button">Comprar</a> -->
+        <!-- <button class="btn btn-success btn-sm" id="pagarCarrito">Comprar</button> -->
         <div id="contenedorCarrito" class="row"></div>
+        <div id="contenedorTabla" class="row"></div>
     </section>
     
     <!-- FOOTER -->
-
     <footer class="d-flex flex-wrap justify-content-between align-items-center py-3 my-4 border-top">
         <p class="col-md-4 mb-0">© 2022 OMG Producciones</p>
     

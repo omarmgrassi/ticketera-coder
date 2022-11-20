@@ -1,6 +1,6 @@
 * {
-    margin: 0;
-    padding: 0;
+    margin: 0px;
+    padding: 0px;
 }
 
 section {
@@ -15,6 +15,23 @@ section {
 
 .toastBkg {
     background: linear-gradient(to right, #593196, #B4A2D0);
+}
+
+.sectionCarrusel {
+    margin-top: 25px;
+}
+
+.hSection {
+    /* PROPIEDADES H2 SECCIONES */
+    text-align: center;
+    background-color: rgb(89, 49, 150);
+    color: #EDF2F4;
+    margin: 10px 0px 10px;
+    padding-bottom: 5px;
+}
+
+.detalleCompra {
+    margin-bottom: 25px;
 }
 
 footer {

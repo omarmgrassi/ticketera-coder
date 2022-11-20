@@ -98,12 +98,32 @@ async function obtenerEventos() {
         ticketera.push(evento);
     })
 
-    // Luego de terminar la carga muestro las cards
+    // Luego de terminar la carga muestro el carrusel y las cards
+    generarCarrusel();
     mostrarCards();
-
 }
 
 obtenerEventos();
+
+// Carrusel eventos
+
+const carruselEventos = document.getElementById("carruselEventos");
+const generarCarrusel = () => {
+    let primero = true;
+    console.log("generarCarrusel >> " + ticketera.length);
+    ticketera.forEach((evento) => {
+        const divItem = document.createElement("div");
+        divItem.classList.add("carousel-item");
+        if ( primero ) {
+            divItem.classList.add("active");
+            primero = false;
+        }
+        divItem.innerHTML = `
+            <img src="${evento.img}" class="d-block w-100" alt="${evento.nombre}">
+            `;
+        carruselEventos.appendChild(divItem);
+    });
+};
 
 // Contenedor de cards
 
@@ -150,16 +170,17 @@ const mostrarCards = () => {
                     'Tenemos promo!',
                     'Comprando 2 o más entradas tendrás un ' + porDescuento + '% de descuento',
                     'success'
-                  )
+                  );
             });
         }
-        
     });
 };
 
-// Contenedor carrito de compras
+// Contenedores carrito de compras + tabla
 
 const contenedorCarrito = document.getElementById("contenedorCarrito");
+const contenedorTabla = document.getElementById("contenedorTabla");
+
 const mostrarCarrito = () => {
     contenedorCarrito.innerHTML = "";
     carrito.forEach((compra) => {
@@ -195,6 +216,73 @@ const mostrarCarrito = () => {
 
     // Actualizo importe total
     calcularImporteCarrito();
+    // Muestro tabla detalle
+    actualizarTabla();
+}
+
+const actualizarTabla = () => {
+
+    contenedorTabla.innerHTML = "";
+
+    // Si el carrito tiene elementos visualizo la tabla
+    if (carrito.length >= 1) {
+
+        // Agrego etiqueta <h3> al contenedor
+        const tituloTabla = document.createElement("h3");
+        tituloTabla.textContent = "Detalle";
+        contenedorTabla.appendChild(tituloTabla);
+        // Genero etiqueta <table>
+        const tabla = document.createElement("table");
+        tabla.classList.add("table", "table-hover");
+        // Genero header/body tabla
+        const theader = document.createElement("thead");
+        const tbody = document.createElement("tbody");
+        // Cargo el header
+        theader.innerHTML = `
+        <tr class="table-dark">
+            <th scope="col">Descripción item</th>
+            <th scope="col">Cant. Entradas</th>
+            <th scope="col">Total</th>
+        </tr>
+        `;
+        // Agrego el header a la tabla
+        tabla.appendChild(theader);
+        let totalCarrito = 0;
+        // Agrego las filas
+        carrito.forEach((compra) => {
+            const tr = document.createElement("tr");
+            let totalEvento = calcularTotalEntradas(compra.cantEntradas, compra.evento);
+            tr.innerHTML = `
+                <th scope="row">Entradas ${compra.evento.nombre}</th>
+                <td>${compra.cantEntradas}</td>
+                <td>$${totalEvento}</td>
+                `;
+            tbody.appendChild(tr);
+            totalCarrito += totalEvento;
+        });
+
+        // Genero ultima fila con total
+        const trTotal = document.createElement("tr");
+        trTotal.classList.add("table-primary");
+        trTotal.innerHTML = `
+            <th scope="row">Total</th>
+            <td></td>
+            <td>$${totalCarrito}</td>
+            `;
+        // Agrego total al body
+        tbody.appendChild(trTotal);
+        // Agrego body a la tabla
+        tabla.appendChild(tbody);
+        // Agrego tabla al contenedor
+        contenedorTabla.appendChild(tabla);
+        // Agrego formulario compra al contenedor
+        contenedorTabla.appendChild( generarFormularioCompra() );
+        // Boton de confirmación de compra
+        const pagarCarrito = document.getElementById("pagarCarrito");
+        pagarCarrito.addEventListener("click", (e) => {
+            confirmarCompra(e);
+        });
+    }
 }
 
 const agregarAlCarrito = (evento) => {
@@ -277,6 +365,36 @@ const calcularImporteCarrito = () => {
     total.innerHTML = `${totalCompra}`;
 }
 
+const confirmarCompra = (e) => {
+
+    // Deshabilito recarga de pagina
+    e.preventDefault();
+
+    // Recupero datos del formulario de compra
+    const nombre = document.getElementById("inputNombre").value;
+    const apellido = document.getElementById("inputApellido").value;
+    const tarjeta = document.getElementById("inputTarjeta").value;
+
+    // Itero sobre el carrito y registro cada venta
+    carrito.forEach((compra) => {
+        const evento = compra.evento;
+        const cantEntradas = compra.cantEntradas;
+        comprarEntrada(cantEntradas, nombre, apellido, evento);
+    });
+
+    // Devuelvo mensaje de transacción exitosa
+    Swal.fire(
+        'Felicidades ' + apellido + ", " + nombre + '. Compra confirmada!',
+        'Se generó un debito sobre su tarjeta ' + tarjeta,
+        'success'
+    );
+    
+    // Reseteo el carrito
+    eliminarTodoElCarrito();
+    console.log(ticketera);
+
+}
+
 // ** Funciones Auxiliares ** //
 
 function calcularTotalEntradas(cantidad, evento) {
@@ -296,3 +414,73 @@ function calcularTotalEntradas(cantidad, evento) {
     return importeEntradas;
 
 }
+
+function generarFormularioCompra() {
+
+    // Genero un elemento <form>
+    const formulario = document.createElement("form");
+    // Agrego los campos al formulario
+    formulario.innerHTML = `
+        <fieldset>
+        <legend>Ingrese los datos de su compra</legend>
+        <div class="form-group">
+            <label for="inputNombre" class="form-label mt-4">Nombre</label>
+            <input type="text" class="form-control" id="inputNombre" placeholder="Ingrese su nombre">
+        </div>
+        <div class="form-group">
+            <label for="inputApellido" class="form-label mt-4">Apellido</label>
+            <input type="text" class="form-control" id="inputApellido" placeholder="Ingrese su apellido">
+        </div>
+        <div class="form-group">
+            <label for="inputTarjeta" class="form-label mt-4">Ingrese medio de pago</label>
+            <select class="form-select" id="inputTarjeta">
+            <option>VISA</option>
+            <option>MASTERCARD</option>
+            <option>AMEX</option>
+            <option>NAJANJA</option>
+            <option>CABAL</option>
+            </select>
+        </div>
+        <br>
+        <button class="btn btn-primary" id="pagarCarrito">Confirmar compra</button> 
+        </fieldset>`;
+
+    return formulario;
+
+}
+
+function comprarEntrada(cantidad, nombreCliente, apellidoCliente, eventoCarrito) {
+
+    let importeEntradas = 0;
+    const IVA = 1.21;
+
+    // Calculo el importe total
+    if (eventoCarrito.tieneDescuento && cantidad > 1) {
+        importeEntradas = ((eventoCarrito.valorEntrada * IVA) - ((eventoCarrito.valorEntrada * IVA) * eventoCarrito.descuento)) * cantidad;
+    }
+    else {
+        importeEntradas = (eventoCarrito.valorEntrada * IVA) * cantidad;
+    }
+
+    // Selecciono el evento de la ticketera
+    let eventoSeleccion = ticketera.find(evento => evento.codigo === eventoCarrito.codigo);
+
+    if ( eventoSeleccion ) {
+        // Incremento la recaudación
+        eventoSeleccion.recaudacion = eventoSeleccion.recaudacion + importeEntradas;
+        // Descuento del stock las entradas vendidas
+        eventoSeleccion.entradasDisponibles = eventoSeleccion.entradasDisponibles - cantidad;
+        // Registro la venta realizada
+        eventoSeleccion.arrayVentas.push( new Venta(nombreCliente, apellidoCliente, cantidad, importeEntradas) );
+    }
+    else {
+        // No se encontró el evento
+        Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'No se pudo registar la venta. Vuelva a intentarlo mas tarde'
+          });
+    }
+
+}
+
