@@ -84,7 +84,7 @@ let ticketera = [];
 let carrito = [];
 
 // Cargo los eventos en la ticketera
-// Defino una funcion con async/await ya que necesito que termine la carga del JSON antes de mostrar las cards.
+// Defino una funcion con async/await ya que necesito que termine la carga del JSON antes de mostrar las cards y el carrusel.
 
 async function obtenerEventos() {
 
@@ -110,7 +110,6 @@ obtenerEventos();
 const carruselEventos = document.getElementById("carruselEventos");
 const generarCarrusel = () => {
     let primero = true;
-    console.log("generarCarrusel >> " + ticketera.length);
     ticketera.forEach((evento) => {
         const divItem = document.createElement("div");
         divItem.classList.add("carousel-item");
@@ -134,7 +133,7 @@ const mostrarCards = () => {
         const card = document.createElement("div");
         card.classList.add("col-xl-3", "col-md-6", "col-xs-12");
         card.innerHTML = `
-            <div class="card" style="width: 18rem;">
+            <div class="card" style="width: 18rem; margin: 25px 0px 25px">
                 <img src="${evento.img}" class="card-img-top" alt="${evento.nombre}">
                 <div class="card-body">
                     <h5 class="card-title">${evento.nombre}</h5>
@@ -142,12 +141,34 @@ const mostrarCards = () => {
                     <p class="card-text">Valor $${evento.valorEntrada} + IVA</p>
                     <button class="btn btn-primary" id="boton${evento.codigo}">Quiero ir!</button>
                     ${btnPromo}
+                    <button class="btn btn-light border-0" id="btnInfo${evento.codigo}"><i class="bi bi-journal-text"></i></button>
                 </div>
             </div>`;
 
         contenedorCards.appendChild(card);
 
-        // Integro librería Toastify al oprimir boton
+        // Integro librería SweerAlert al oprimir boton de info (icono librito)
+        const botonInfo = document.getElementById(`btnInfo${evento.codigo}`);
+        botonInfo.addEventListener("click", () => {
+            let entradasVendidas = evento.aforo - evento.entradasDisponibles;
+            let datosEvento = `
+                <ul style="text-align: left">
+                    <li>Código: ${evento.codigo}</li>
+                    <li>Lugar: ${evento.lugar}</li>
+                    <li>Aforo: ${evento.aforo}</li>
+                    <li>Entradas vendidas: ${entradasVendidas}</li>
+                    <li>Entradas disponibles p/venta: ${evento.entradasDisponibles}</li>
+                    <li>Recaudación: $${evento.recaudacion}</li>
+                </ul>`;
+            Swal.fire({
+                title: evento.nombre, 
+                html: datosEvento,  
+                confirmButtonText: "Ok",
+                icon: "info"
+              });
+        });
+
+        // Integro librería Toastify al agregar entrada al carrito
         const boton = document.getElementById(`boton${evento.codigo}`);
         boton.addEventListener("click", () => {
             agregarAlCarrito(evento);
@@ -187,7 +208,7 @@ const mostrarCarrito = () => {
         const card = document.createElement("div");
         card.classList.add("col-xl-3", "col-md-6", "col-xs-12");
         card.innerHTML = `
-            <div class="card" style="width: 18rem;">
+            <div class="card" style="width: 18rem; margin: 25px 0px 25px">
                 <img src="${compra.evento.img}" class="card-img-top" alt="${compra.evento.nombre}">
                 <div class="card-body">
                     <h5 class="card-title">${compra.evento.nombre}</h5>
@@ -229,6 +250,7 @@ const actualizarTabla = () => {
 
         // Agrego etiqueta <h3> al contenedor
         const tituloTabla = document.createElement("h3");
+        tituloTabla.classList.add("detalleCompra");
         tituloTabla.textContent = "Detalle";
         contenedorTabla.appendChild(tituloTabla);
         // Genero etiqueta <table>
@@ -310,10 +332,12 @@ vaciarCarrito.addEventListener("click", () => {
 });
 
 const eliminarTodoElCarrito = () => {
+
     // Reseteo array
     carrito = [];
     // Actualizo contenedor cards carrito
     mostrarCarrito();
+
 }
 
 const sumarEntradaACompra = (evento) => {
@@ -357,12 +381,14 @@ const eliminarCompraDelCarrito = (evento) => {
 }
 
 const calcularImporteCarrito = () => {
+
     let totalCompra = 0;
     carrito.forEach((compra) => {
         // Sumarizo total entradas del evento
         totalCompra += calcularTotalEntradas(compra.cantEntradas, compra.evento);
     });
     total.innerHTML = `${totalCompra}`;
+    
 }
 
 const confirmarCompra = (e) => {
@@ -391,7 +417,6 @@ const confirmarCompra = (e) => {
     
     // Reseteo el carrito
     eliminarTodoElCarrito();
-    console.log(ticketera);
 
 }
 

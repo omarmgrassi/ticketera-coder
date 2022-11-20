@@ -42,5 +42,49 @@
         "tieneDescuento":false, 
         "porcenDescuento":0, 
         "img":"./img/servian.jpg"
+    },
+    {
+        "nombre":"Coldplay", 
+        "codigo":"CP2022", 
+        "fecha":"02/11/2022", 
+        "cantEntradas":55000, 
+        "lugar":"Estadio Monumental", 
+        "precioEntrada":10000, 
+        "tieneDescuento":false, 
+        "porcenDescuento":0, 
+        "img":"./img/coldplay.jpg"
+    },
+    {
+        "nombre":"Oktoberfest en Munich", 
+        "codigo":"OKB2022", 
+        "fecha":"22/12/2022", 
+        "cantEntradas":5500, 
+        "lugar":"Arena Munich", 
+        "precioEntrada":5000, 
+        "tieneDescuento":true, 
+        "porcenDescuento":0.30, 
+        "img":"./img/mundial.jpg"
+    },
+    {
+        "nombre":"Cirque Du Solei", 
+        "codigo":"CDS2022", 
+        "fecha":"15/12/2022", 
+        "cantEntradas":5500, 
+        "lugar":"Movistar Arena", 
+        "precioEntrada":7500, 
+        "tieneDescuento":false, 
+        "porcenDescuento":0, 
+        "img":"./img/cirque.jpg"
+    },
+    {
+        "nombre":"Ted TALK", 
+        "codigo":"Ted2022", 
+        "fecha":"01/12/2022", 
+        "cantEntradas":2500, 
+        "lugar":"Teatro Gran Rex", 
+        "precioEntrada":2500, 
+        "tieneDescuento":true, 
+        "porcenDescuento":0.1, 
+        "img":"./img/ted.jpg"
     }
 ]
